@@ -72,8 +72,6 @@ def main():
         if class_id == -1:
             assert class_name == '__ignore__'
             continue
-        elif class_id == 0:
-            assert class_name == '_background_'
         class_name_to_id[class_name] = class_id
         data['categories'].append(dict(
             supercategory=None,
@@ -135,14 +133,16 @@ def main():
             mask = np.asfortranarray(mask.astype(np.uint8))
             mask = pycocotools.mask.encode(mask)
             area = float(pycocotools.mask.area(mask))
+            bbox = pycocotools.mask.toBbox(mask).flatten().tolist()
 
             data['annotations'].append(dict(
                 id=len(data['annotations']),
-                segmentation=segmentations[label],
-                area=area,
-                iscrowd=None,
                 image_id=image_id,
                 category_id=cls_id,
+                segmentation=segmentations[label],
+                area=area,
+                bbox=bbox,
+                iscrowd=0,
             ))
 
     with open(out_ann_file, 'w') as f:
